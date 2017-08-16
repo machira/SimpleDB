@@ -1,23 +1,27 @@
+import json
 import os
 
 
 class SimpleDB:
-    # DATA_FILE = ''
-
     def __init__(self, data_file='data.json'):
         self.DATA_FILE = data_file
-        # self._create_data_file()
 
-    def create(self, data):
-        self._create_data_file()
+    def write(self, data):
+        self._create_data_file_if_not_exists()
+        store = self.read()
+        store.append(data)
 
-        pass
+        with open(self.DATA_FILE, 'w') as f:
+            txt = json.dumps(store)
+            f.write(txt)
 
     def read(self):
+        self._create_data_file_if_not_exists()
         with open(self.DATA_FILE, 'r') as f:
-            return f.read()
+            data = f.read()
+            return json.loads(data)
 
-    def _create_data_file(self):
+    def _create_data_file_if_not_exists(self):
         if not os.path.isfile(self.DATA_FILE):
             with open(self.DATA_FILE, 'w') as f:
                 f.write('[]')
