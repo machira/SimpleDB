@@ -21,6 +21,10 @@ class SimpleDB:
             data = f.read()
             return json.loads(data)
 
+    def query(self, func):
+        data = self.read()
+        return list(filter(func, data))
+
     def _create_data_file_if_not_exists(self):
         if not os.path.isfile(self.DATA_FILE):
             with open(self.DATA_FILE, 'w') as f:
