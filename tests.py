@@ -83,3 +83,26 @@ class QueryTest(TestCase):
     def tearDown(self):
         if os.path.exists(self.path):
             os.remove(self.path)
+
+
+class Update(TestCase):
+    path = 'queries.json'
+
+    def setUp(self):
+        self.db = SimpleDB(data_file=self.path)
+        for d in [{'a': 1}, {'a': 2}, {'a': 3}]:
+            self.db.write(d)
+
+    def tearDown(self):
+        if os.path.exists(self.path):
+            os.remove(self.path)
+
+    def test_double_even_numbers(self):
+        def double(x): return {'a': x['a'] * 2}
+
+        def even(x): return x['a'] % 2 == 0
+
+        self.db.update(even, double)
+        expected = [{'a': 1}, {'a': 4}, {'a': 3}]
+        actual = self.db.read()
+        self.assertEqual(expected, actual)

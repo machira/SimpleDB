@@ -25,6 +25,18 @@ class SimpleDB:
         data = self.read()
         return list(filter(func, data))
 
+    def update(self, finder, updater):
+        data = self.read()
+
+        def _update_function(x):
+            return updater(x) if finder(x) else x
+
+        updated_data = list(map(_update_function, data))
+
+        with open(self.DATA_FILE, 'w') as f:
+            txt = json.dumps(updated_data)
+            f.write(txt)
+
     def _create_data_file_if_not_exists(self):
         if not os.path.isfile(self.DATA_FILE):
             with open(self.DATA_FILE, 'w') as f:
@@ -32,4 +44,4 @@ class SimpleDB:
 
 
 if __name__ == '__main__':
-    print("foo")
+    pass
