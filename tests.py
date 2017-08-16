@@ -106,3 +106,29 @@ class Update(TestCase):
         expected = [{'a': 1}, {'a': 4}, {'a': 3}]
         actual = self.db.read()
         self.assertEqual(expected, actual)
+
+
+class Sugar(TestCase):
+    path = 'queries.json'
+
+    def setUp(self):
+        self.db = SimpleDB(data_file=self.path)
+        test_data = [{'project': 'Phoenix', 'sightings': 10, 'location': 'Nairobi'},
+                     {'project': 'BlueJay', 'sightings': 15, 'location': 'Nairobi'},
+                     {'project': 'Phoenix', 'sightings': 2, 'location': 'Nairobi'}]
+        for d in test_data:
+            self.db.write(d)
+
+    def tearDown(self):
+        if os.path.exists(self.path):
+            os.remove(self.path)
+
+    def test_countBy(self):
+        expected = {'Nairobi': 3}
+        actual = self.db.countBy('location')
+        self.assertEqual(expected, actual)
+
+    def test_projection(self):
+        expected = ['Phoenix', 'BlueJay', 'Phoenix']
+        actual = self.db.project('project')
+        self.assertEqual(actual, expected)

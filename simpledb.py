@@ -1,5 +1,6 @@
 import json
 import os
+from collections import Counter
 
 
 class SimpleDB:
@@ -25,17 +26,26 @@ class SimpleDB:
         data = self.read()
         return list(filter(func, data))
 
-    def update(self, finder, updater):
+    def update(self, test_func, update_func):
         data = self.read()
 
         def _update_function(x):
-            return updater(x) if finder(x) else x
+            return update_func(x) if test_func(x) else x
 
         updated_data = list(map(_update_function, data))
 
         with open(self.DATA_FILE, 'w') as f:
             txt = json.dumps(updated_data)
             f.write(txt)
+
+    def project(self, field):
+        data = self.read()
+        return list(map(lambda x: x[field], data))
+
+    def countBy(self, field):
+        list_for_field = self.project(field)
+        frequency = Counter(list_for_field)
+        return dict(frequency)
 
     def _create_data_file_if_not_exists(self):
         if not os.path.isfile(self.DATA_FILE):
