@@ -108,6 +108,46 @@ class Update(TestCase):
         self.assertEqual(expected, actual)
 
 
+class Delete(TestCase):
+    path = 'delete.json'
+
+    def setUp(self):
+        self.db = SimpleDB(data_file=self.path)
+        for d in [{'a': 1}, {'a': 2}, {'a': 3}]:
+            self.db.write(d)
+
+    def tearDown(self):
+        if os.path.exists(self.path):
+            os.remove(self.path)
+
+    def test_should_delete_evens(self):
+        def even(x): return x['a'] % 2 == 0
+
+        self.db.delete(even)
+
+        expected = [{'a': 1}, {'a': 3}]
+        actual = self.db.read()
+        self.assertEqual(actual, expected)
+
+    def test_should_delete_everything(self):
+        def everthing(_): return True
+
+        self.db.delete(everthing)
+
+        expected = []
+        actual = self.db.read()
+        self.assertEqual(actual, expected)
+
+    def test_should_delete_nothing(self):
+        def nothing(x): return x['a'] > 5;
+
+        self.db.delete(nothing)
+
+        expected = [{'a': 1}, {'a': 2}, {'a': 3}]
+        actual = self.db.read()
+        self.assertEqual(actual, expected)
+
+
 class Sugar(TestCase):
     path = 'queries.json'
 

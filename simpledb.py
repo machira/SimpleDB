@@ -52,6 +52,15 @@ class SimpleDB:
             with open(self.DATA_FILE, 'w') as f:
                 f.write('[]')
 
+    def delete(self, func):
+        result = []
+        for item in self.read():
+            if not func(item):
+                result.append(item)
+
+        with open(self.DATA_FILE, 'w') as f:
+            txt = json.dumps(result)
+            f.write(txt)
 
 if __name__ == '__main__':
     pass
